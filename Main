@@ -1,0 +1,172 @@
+#include <LiquidCrystal.h>
+#include "variables.h"
+
+LiquidCrystal lcd(23, 22, 17, 16, 15, 14);
+
+void setup() 
+{
+  pinMode(button1, INPUT_PULLUP);
+  pinMode(button2, INPUT_PULLUP);
+  pinMode(button3, INPUT_PULLUP);
+  pinMode(button4, INPUT_PULLUP);
+
+  lcd.begin(16, 2);
+  lcd.print("Coffee Y'all");
+  delay(2000);
+  lcd.clear();
+  lcd.createChar(0,arrowLeft);
+  lcd.createChar(1,arrowRight);
+}
+
+void loop() 
+{
+  state1 = digitalRead(button1);
+  state2 = digitalRead(button2);
+  state3 = digitalRead(button3);
+  state4 = digitalRead(button4);
+  displayState();
+//Display state from earlier determines what is shown and what variables are being adjusted
+  switch(displayState)
+  {
+    case 0:
+      lcd.setCursor(0,0);
+      lcd.print("Set Brew Temp");
+      lcd.write(byte(1));
+      if (state1 != prev1)
+      { 
+        if (state1 == LOW)
+        {
+          tempSet++;
+          if (tempSet > 100)
+          {
+            tempSet = 100;
+          }
+        }
+        delay(50);
+      }
+      prev1 = state1;
+      
+      if (state2 != prev2)
+      {
+        if (state2 == LOW)
+        {
+          tempSet--;
+          if (tempSet < 20)
+          {
+            tempSet = 20;
+          }
+        }
+        delay(50);
+      }
+      prev2 = state2;
+      
+      lcd.setCursor(0,1);
+      lcd.print(tempSet);
+      lcd.print("C");
+    break;
+    
+    case 1:
+      lcd.setCursor(0,0);
+      lcd.write(byte(0));
+      lcd.print("Set Steep Time");
+      lcd.write(byte(1));
+      if (state1 != prev1)
+      {
+        if (state1 == LOW)
+        {
+          steepTime++;
+          if (steepTime > 600)
+          {
+            steepTime = 600;
+          }
+        }
+        delay(50);
+      }
+      prev1 = state1;
+      
+      if (state2 != prev2)
+      {
+        if (state2 == LOW)
+        {
+          steepTime--;
+          if (steepTime < 0)
+          {
+            steepTime = 0;
+          }
+        }
+        delay(50);
+      }
+      prev2 = state2;
+      
+      lcd.setCursor(0,1);
+      lcd.print(steepTime);
+      lcd.print("sec");
+    break;
+    
+    case 2:
+      lcd.setCursor(0,0);
+      lcd.write(byte(0));
+      lcd.print("Brew Volume");
+      lcd.write(byte(1));
+      if (state1 != prev1)
+      {
+        if (state1 == LOW)
+        {
+          brewVol++;
+          if (brewVol > 32)
+          {
+            brewVol = 32;
+          }
+        }
+        delay(50);
+      }
+      prev1 = state1;
+      
+      if (state2 != prev2)
+      {
+        if (state2 == LOW)
+        {
+          brewVol--;
+          if (brewVol < 0)
+          {
+            brewVol = 0;
+          }
+        }
+        delay(50);
+      }
+      prev2 = state2;
+      
+      lcd.setCursor(0,1);
+      lcd.print(brewVol);
+      lcd.print("oz");
+    break;
+    
+    case 3:
+      lcd.setCursor(0,0);
+      lcd.write(byte(0));
+      lcd.print("Enable Stir?");
+      if (state1 != prev1)
+      {
+        if (state1 == LOW)
+        {
+          stirTF = true;
+        }
+        delay(50);
+      }
+      prev1 = state1;
+      
+      if (state2 != prev2)
+      {
+        if (state2 == LOW)
+        {
+          stirTF = false;
+        }
+        delay(50);
+      }
+      prev2 = state2;
+      
+      lcd.setCursor(0,1);
+      lcd.print(stirTF);
+    break;  
+  }
+}
